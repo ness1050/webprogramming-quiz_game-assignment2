@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyPage</title>
+        <link rel="stylesheet" href="#">
+    </head>
+    <body>
+        <header>
+            <div class="progress-bar-top"></div>
+            <h1>Quiz</h1>
+            <button id="Highscore-btn" tabindex="0"><strong>HighScore table</strong></button>
+        </header>
+        <div id="rule" class="rule">
+            <h2><strong>Rules</strong> to Follow</h2>
+            <h2>Each question will have 10 seconds to be answered!</h2>
+            <h2>You must enter your nickname to be able to start the quiz</h2>
+        </div>
+        <form class="name-form" id="name-form">
+            <h1>welcome</h1>
+            <label for="name">Please Enter name/nickname</label>
+            <input type="text" id="name"  tabindex="1" required>
+            <button id="start" tabindex="2">Start Quiz</button>
+        </form>
+        <form class="question-container" id="question-container" tabindex="3">
+            <h1 id="question">Question</h1>
+            <h2 id="time"></h2>
+            <div class="program-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+        </form>
+    </body>
+</html>
