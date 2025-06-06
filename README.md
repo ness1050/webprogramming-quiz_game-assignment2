@@ -33,3 +33,5 @@ Then you will come to the main page where you will need to click with mouse once
 There will be a name form and some rules information, the rule be displayed only for some seconds.
 To be able to start the game the user must put a name or nickname inside the box then he/she will be able to play the game.
 When the game starts each question will be different some simple question and some with alternatives, for each question 10 s will be given to answer if failed to answer or answered wrong then the game Ends with a message.
+
+Author: Naseem Qurbanali
