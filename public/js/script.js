@@ -277,6 +277,89 @@ function handleRadioBtn (label) {
   ansBtn.disabled = !(label.id === '1')
 }
 
+/**
+ * returns the button checked from the radio buttons.
+ * @returns {string} the alternative chisen.
+ */
+function getCheckedBtn () {
+  for (let i = 0; i < btns.length; i++) {
+    if (btns[i].id === '1') {
+      return btns[i].name
+    }
+  }
+  return ''
+}
+
+/**
+ * the function that is called when the user wins or loses.
+ * @param {string} message is the message to be shown when gane is over.
+ */
+function gameOver (message) {
+  clearInterval(timer)
+  clearInterval(progressTimer)
+
+  result.innerHTML = message
+  hideShow('show', resultDiv)
+  hideShow('hide', timeH2)
+  hideShow('hide', questionContainer)
+  displayResults()
+}
+
+document.getElementById('Highscore-btn').addEventListener('click', function () {
+  displayResults()
+})
+
+/**
+ * displays the results as a table in the result div.
+ */
+function displayResults () {
+  // look at list from localstorage and add the values to the list exsisting here.
+  const savedScores = JSON.parse(localStorage.getItem('highScoreList'))
+  if (savedScores != null) {
+    savedScores.forEach(result => highScoreList.push(result))
+  }
+
+  // sort the list and get only the first 5 objects.
+  highScoreList.sort((a, b) => a.time - b.time)
+  highScoreList = highScoreList.slice(0, 5)
+  localStorage.setItem('highScoreList', JSON.stringify(highScoreList))
+
+  // create a table element
+  const table = document.getElementById('score-table')
+  table.replaceChildren()
+
+  // create a table header with the column names
+  const thead = document.createElement('thead')
+  const tr = document.createElement('tr')
+  tr.innerHTML = '<th>name</th><th>Time</th>'
+  thead.appendChild(tr)
+  table.appendChild(thead)
+
+  // create a table body and add a row for each score in the highScoreList
+  const tbody = document.createElement('tbody')
+  highScoreList.forEach(result => {
+    const tr = document.createElement('tr')
+    tr.innerHTML = `<td>${result.name}</td><td>${result.time}</td>`
+    tbody.appendChild(tr)
+  })
+  table.appendChild(tbody)
+
+  // add the table to the result div
+  resultDiv.appendChild(table)
+  hideShow('show', resultDiv)
+}
+
+/**
+ * Clear score before new page.
+ */
+function clearHighScore () {
+  localStorage.removeItem('highScoreList')
+}
+
+window.addEventListener('load', () => {
+  clearHighScore()
+})
+
 
 
 
