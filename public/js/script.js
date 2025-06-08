@@ -47,3 +47,74 @@ function getname(name) {
     hideShow('hide', nameForm)
     hideShow('show', questionContainer)
 }
+
+
+/**
+ * Starts the timer when questions are about to be answered!
+ */
+function startTimer() {
+    clearInterval(progressTimer);
+    const time = 10;
+    setInterval(progressTimer(time), 10000);
+}
+
+/**
+ * This resets the progress style and other.
+ */
+function resetProgressBar() {
+    progressbar.style.transition = 'none';
+    progressbar.style.width = '100%';
+    progressbar.style.backgroundColor ='green';
+}
+
+function progressBarTimer(time) {
+    progressbar.style.transition = 'all 1s linear';
+
+    timeH2.innerHTML = 'time: ' + time + ' s'
+    progressTimer = setInterval(() => {
+        time -= 1;
+        if(time < 0) {
+            gameOver("TIme's up <br> Game Over!")
+        } else {
+            if (time === 5) {
+                progressbar.style.backgroundColor = 'orange';
+            }
+            if (time  === 2) {
+                progressbar.style.backgroundColor = 'red';
+            }
+            progressbar.style.width = `${(time / 10) * 100}%`;
+            timeH2.innerHTML = 'time: ' + time + ' s';
+        }
+    })
+}
+
+startBtn.addEventListener('click', e => {
+    e.preventDefault()
+    removeWarningSign()
+
+    const name = document.getElementById('name')
+    if(name.value === '') {
+        displayWarningSign()
+    } else {
+        startQuiz(name)
+    }
+})
+
+/**
+ * Starts the quiz when the user has entered a name
+ * @param {name} name is tbe element where to get the name 
+ */
+async function startQuiz(name) {
+    getname(name)
+    hideShow('hide', resultDiv)
+    const question = await fetching(startUrl)
+
+    if (question.status === 200) {
+        userTime = Date.now()
+        createQuestion(await question.json())
+        document.getElementById('question-container').focus()
+    } else {
+        alert('Some problem occured!')
+        console.log('error occured')
+    }
+}
