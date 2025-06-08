@@ -20,7 +20,7 @@ const progressbar = document.getElementById('progress-bar');
 let Name = "";
 let userTime
 let questionType = 0;
-let btn = []
+let btns = []
 let nextUrl = ''
 let timer
 let progressTimer
@@ -118,3 +118,144 @@ async function startQuiz(name) {
         console.log('error occured')
     }
 }
+
+function createQuestion(response) {
+    clearInterval(timer);
+    const questionElement = document.getElementById('question')
+    question.innerHTML = response.question;
+
+    if('aleternative' in response) {
+        questionType = 1;
+        hideShow('hide', ansField)
+        hideShow('show', radioBtnDiv)
+
+        btns = []
+        createRadioBtns(response.alternatives)
+        questionElement.parentElement.tabIndex = 3
+        btns.forEach((radioBtn, index) => {
+            radioBtn.tabIndex = 3 + index;
+        })
+
+        if (btns.length > 0) {
+            btns[0].focus()
+        }
+    } else {
+        questionType = 0
+        hideShow('show', ansField)
+        hideShow('hide', radioBtnDiv)
+
+        ansField.tabIndex = 4;
+        questionElement.parentElement.tabIndex = 3
+        ansField.focus()
+    }
+
+    if ('nextURL' in response) {
+        nextUrl = response.nextUrl
+    }
+
+    timer = startTimer()
+}
+
+
+ansBtn.addEventListener('click', e =>  {
+    e.preventDefault()
+
+    if (questionType === 0 && ansField.value === '' ) {
+        gameOver('You Did not answer the question')
+    } else {
+        const checkBtn = getCheckedBtn()
+
+        const opt = {
+            method : 'post',
+            headers: {
+                'Content-type' : 'application/json'
+            }, 
+            body : JSON.stringify (
+                {anser: (questionType === 0) ? ansField.value : checkBtn}
+            )
+        }
+        radioBtnDiv.replaceChildren()
+        ansField.value = ''
+
+        sendResponse(nextUrl, opt)
+    }
+})
+
+/**
+ * Fucntion that creat and send the response to the Server
+ * handle response of response
+ * @param {url} url is the URL where to send the anser 
+ * @param {object} opt json file to be sended
+ */
+async function sendResponse (url, opt) {
+    const resOnRes = await fetching(url, opt)
+    const resOnResDate = await resOnRes.json()
+
+    resetProgressBar()
+
+    if (resOnRes.status === 200) {
+        if ('nextURL' in resOnResDate) {
+            const nextQuestion = await fetch(resOnResDate.nextUrl)
+
+            createQuestion(await nextQuestion.json())
+        } else {
+            userTime = ((Date.now() - userTime)/ 1000)
+            highScorList.push({name: Name, time: userTime})
+
+            gameOver('Wow!, A very Fast win! <br> time: ' + userTime + ' s')
+        }
+    } else if (resOnRes.status === 400) {
+        gameOver(resOnResDate.message + '<br> Game over!!')
+    }
+}
+
+
+/**
+ * This function will create labels
+ * which contains the anser alternatives
+ * added eventlistner to check which radio button has been choosen
+ * @param {object} alternatives alternative anser for the questions 
+ */
+function createRadioBtns (alternatives) {
+
+    for (const alt in alternatives) {
+        const label = document.createElement('label')
+        const radioBtn = document.createElement('input')
+
+        label.classList.add('label')
+        label.innerHTML = alternatives[alt]
+        label.name = alt
+        label.id = '0'
+
+        radioBtn.type = 'radio'
+        radioBtn.name = 'radio-group'
+
+        label.appendChild(radioBtn)
+        radioBtnDiv.appendChild(label)
+        btns.push(label)
+
+        label.addEventListener('click', () =>{
+            handleRadioBtn(label) 
+            for (let l = 0; l < btns.length; l++) {
+                btns[l].id = '0'
+                btns[l].style.borderColor = 'black'
+                btns[l].style.backgroundColor = 'rgba(0, 60, 255, 0.349)'
+                btns[l].style.border = '1px solid'
+            }
+            ansField.style.borderColor = 'black'
+            ansField.style.backgroundColor = 'white'
+            // Toggle the selection for the clicked button
+            label.id = label.id === '1' ? '0' : '1'
+            // styling based on the question type
+            radioBtn.tabIndex = 5
+
+        })
+        if (btns.length > 0) {
+            btns[0].focus()
+        }
+    }
+}
+
+
+
+
