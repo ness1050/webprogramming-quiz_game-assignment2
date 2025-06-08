@@ -1,261 +1,265 @@
-/* Author: Naseem Qurbanali*/
+/* Author nq222af */
+import { displayWarningSign, removeWarningSign, hideShow, hideRest, hideRule } from './ui.js'
+import { fetching } from './api.js'
 
-import {displayWarningSign, removeWarningSign, hideShow, hideRest, hideRule} from './ui'
-import { fetching } from './api'; 
+const startUrl = 'https://courselab.lnu.se/quiz/question/1' // default url.
 
+// DOM with its elements and decleration of some constants.
+const nameForm = document.getElementById('name-form')
+const startBtn = document.getElementById('start')
+const answerBtn = document.getElementById('submit')
+const question = document.getElementById('question')
+const answerField = document.getElementById('answer')
+const radioBtnDiv = document.getElementById('radio-buttons')
+const progressBar = document.getElementById('progress-bar')
 
-const startUrl =  'https://courselab.lnu.se/quiz/question/1';
-
-// DOM wiht its elements and decleration of some constants.
-
-const nameForm = document.getElementById('name-form');
-const startBtn = document.getElementById('start');
-const ansBtn = document.getElementById('submit');
-const question = document.getElementById('question');
-const ansField = document.getElementById('answer');
-const radioBtnDiv = document.getElementById('radio-buttons');
-const progressbar = document.getElementById('progress-bar');
-
-// Assuming 
-let Name = "";
+let NAME = ''
 let userTime
-let questionType = 0;
+let questionType = 0
 let btns = []
-let nextUrl = ''
+let nexturl = ''
 let timer
-let progressTimer
-let highScorList = []
+let progressTimer // progress timer for the questions.
+let highScoreList = [] // to store highscore.
 
-const questionContainer = document.getElementById('question-container');
-hideShow('hide', questionContainer); // hides the question container from user
-const result = document.getElementById('result');
-const resultDiv = document.getElementById('result-div');
-hideShow('hide', resultDiv);
-const timeH2 = document.getElementById('time');
-const restartBtn = document.getElementById('restart');
+const questionContainer = document.getElementById('question-container')
+hideShow('hide', questionContainer) // hides the questions from user.
+const result = document.getElementById('result')
+const resultDiv = document.getElementById('result-div')
+hideShow('hide', resultDiv) // should not show result.
+const timeH2 = document.getElementById('time') // the element where to show the thime in the page
+const restartBtn = document.getElementById('restart')
 
-hideRest();
-hideRule();
+hideRest()
 
-/**
- * this functions gets the name before quiz
- * @param {name} takes name as parameter
- */
-function getname(name) {
-    Name = name.value;
-    name.value = ''
-    hideShow('hide', nameForm)
-    hideShow('show', questionContainer)
-}
-
+hideRule()
 
 /**
- * Starts the timer when questions are about to be answered!
+ * gets the name of the user before starting the quiz.
+ * @param {name} name is the element where to get the name from.
  */
-function startTimer() {
-    clearInterval(progressTimer);
-    const time = 10;
-    setInterval(progressTimer(time), 10000);
+function getname (name) {
+  NAME = name.value
+  name.value = ''
+  hideShow('hide', nameForm)
+  hideShow('show', questionContainer)
 }
 
 /**
- * This resets the progress style and other.
+ * start the timer for the questions.
  */
-function resetProgressBar() {
-    progressbar.style.transition = 'none';
-    progressbar.style.width = '100%';
-    progressbar.style.backgroundColor ='green';
+function startTimer () {
+  clearInterval(progressTimer) // clears the existing timmer.
+  const time = 10 // timmer set to 10 seconds.
+  setInterval(progressBarTimer(time), 10000)
 }
 
-function progressBarTimer(time) {
-    progressbar.style.transition = 'all 1s linear';
+/**
+ * reset the progressBar to 100% with removing the transition
+ */
+function resetProgressBar () {
+  progressBar.style.transition = 'none'
+  progressBar.style.width = '100%'
+  progressBar.style.backgroundColor = 'green'
+}
 
-    timeH2.innerHTML = 'time: ' + time + ' s'
-    progressTimer = setInterval(() => {
-        time -= 1;
-        if(time < 0) {
-            gameOver("TIme's up <br> Game Over!")
-        } else {
-            if (time === 5) {
-                progressbar.style.backgroundColor = 'orange';
-            }
-            if (time  === 2) {
-                progressbar.style.backgroundColor = 'red';
-            }
-            progressbar.style.width = `${(time / 10) * 100}%`;
-            timeH2.innerHTML = 'time: ' + time + ' s';
-        }
-    })
+/**
+ * this timer is mainly used to update the progressBar.
+ * @param {number} time is the seconde which will be displayed.
+ */
+function progressBarTimer (time) {
+  progressBar.style.transition = 'all 1s linear'
+
+  timeH2.innerHTML = 'time: ' + time + ' s'
+  progressTimer = setInterval(() => {
+    time -= 1
+    if (time < 0) {
+      gameOver("Time's up <br> Game Over")
+    } else {
+      if (time === 5) {
+        progressBar.style.backgroundColor = 'orange'
+      }
+      if (time === 2) {
+        progressBar.style.backgroundColor = 'red'
+      }
+      progressBar.style.width = `${(time / 10) * 100}%`
+      timeH2.innerHTML = 'time: ' + time + ' s'
+    }
+  }, 1000)
 }
 
 startBtn.addEventListener('click', e => {
-    e.preventDefault()
-    removeWarningSign()
+  e.preventDefault()
 
-    const name = document.getElementById('name')
-    if(name.value === '') {
-        displayWarningSign()
-    } else {
-        startQuiz(name)
-    }
+  removeWarningSign()
+
+  const name = document.getElementById('name')
+  if (name.value === '') {
+    displayWarningSign()
+  } else {
+    startQuiz(name)
+  }
 })
 
 /**
- * Starts the quiz when the user has entered a name
- * @param {name} name is tbe element where to get the name 
+ * Starts the quiz when the user has entered a name.
+ * @param {name} name is tbe element where to get the name.
  */
-async function startQuiz(name) {
-    getname(name)
-    hideShow('hide', resultDiv)
-    const question = await fetching(startUrl)
+async function startQuiz (name) {
+  getname(name)
+  hideShow('hide', resultDiv)
+  const question = await fetching(startUrl)
 
-    if (question.status === 200) {
-        userTime = Date.now()
-        createQuestion(await question.json())
-        document.getElementById('question-container').focus()
-    } else {
-        alert('Some problem occured!')
-        console.log('error occured')
-    }
+  if (question.status === 200) {
+    userTime = Date.now()
+    createQuestion(await question.json())
+    document.getElementById('question-container').focus()
+  } else {
+    alert('Some problem occured!')
+    console.log('error occured')
+  }
 }
 
-function createQuestion(response) {
-    clearInterval(timer);
-    const questionElement = document.getElementById('question')
-    question.innerHTML = response.question;
+/**
+ * creates the question froms the response of the server.
+ * @param {object} response is the response containing the question.
+ */
+function createQuestion (response) {
+  clearInterval(timer)
+  const questionElement = document.getElementById('question')
+  question.innerHTML = response.question
 
-    if('aleternative' in response) {
-        questionType = 1;
-        hideShow('hide', ansField)
-        hideShow('show', radioBtnDiv)
+  if ('alternatives' in response) {
+    questionType = 1
+    hideShow('hide', answerField)
+    hideShow('show', radioBtnDiv)
 
-        btns = []
-        createRadioBtns(response.alternatives)
-        questionElement.parentElement.tabIndex = 3
-        btns.forEach((radioBtn, index) => {
-            radioBtn.tabIndex = 3 + index;
-        })
+    btns = []
+    createRadioBtns(response.alternatives)
 
-        if (btns.length > 0) {
-            btns[0].focus()
-        }
-    } else {
-        questionType = 0
-        hideShow('show', ansField)
-        hideShow('hide', radioBtnDiv)
+    questionElement.parentElement.tabIndex = 3
 
-        ansField.tabIndex = 4;
-        questionElement.parentElement.tabIndex = 3
-        ansField.focus()
+    btns.forEach((radioBtn, index) => {
+      radioBtn.tabIndex = 3 + index
+    })
+
+    if (btns.length > 0) {
+      btns[0].focus()
     }
+  } else {
+    questionType = 0
+    hideShow('show', answerField)
+    hideShow('hide', radioBtnDiv)
 
-    if ('nextURL' in response) {
-        nextUrl = response.nextUrl
-    }
+    answerField.tabIndex = 4
+    questionElement.parentElement.tabIndex = 3
+    answerField.focus()
+  }
 
-    timer = startTimer()
+  if ('nextURL' in response) {
+    nexturl = response.nextURL
+  }
+  timer = startTimer()
 }
 
+answerBtn.addEventListener('click', e => {
+  e.preventDefault()
 
-ansBtn.addEventListener('click', e =>  {
-    e.preventDefault()
+  if (questionType === 0 && answerField.value === '') {
+    gameOver('You Did not answer the question!')
+  } else {
+    const checkedBtn = getCheckedBtn()
 
-    if (questionType === 0 && ansField.value === '' ) {
-        gameOver('You Did not answer the question')
-    } else {
-        const checkBtn = getCheckedBtn()
-
-        const opt = {
-            method : 'post',
-            headers: {
-                'Content-type' : 'application/json'
-            }, 
-            body : JSON.stringify (
-                {anser: (questionType === 0) ? ansField.value : checkBtn}
-            )
-        }
-        radioBtnDiv.replaceChildren()
-        ansField.value = ''
-
-        sendResponse(nextUrl, opt)
+    const opt = {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        { answer: (questionType === 0) ? answerField.value : checkedBtn }
+      )
     }
+
+    radioBtnDiv.replaceChildren()
+    answerField.value = ''
+
+    sendResponse(nexturl, opt)
+  }
 })
 
 /**
- * Fucntion that creat and send the response to the Server
- * handle response of response
- * @param {url} url is the URL where to send the anser 
- * @param {object} opt json file to be sended
+ * function that creates and sends the response to the server.
+ * it also handle the response of the response.
+ * @param {url} url is the URL where to sen the.
+ * @param {object} opt is the json to be sended.
  */
 async function sendResponse (url, opt) {
-    const resOnRes = await fetching(url, opt)
-    const resOnResDate = await resOnRes.json()
+  const resOnRes = await fetching(url, opt)
+  const resOnResData = await resOnRes.json()
 
-    resetProgressBar()
+  resetProgressBar()
 
-    if (resOnRes.status === 200) {
-        if ('nextURL' in resOnResDate) {
-            const nextQuestion = await fetch(resOnResDate.nextUrl)
+  if (resOnRes.status === 200) {
+    if ('nextURL' in resOnResData) {
+      const nextQuestion = await fetch(resOnResData.nextURL)
 
-            createQuestion(await nextQuestion.json())
-        } else {
-            userTime = ((Date.now() - userTime)/ 1000)
-            highScorList.push({name: Name, time: userTime})
+      createQuestion(await nextQuestion.json())
+    } else {
+      userTime = ((Date.now() - userTime) / 1000)
+      highScoreList.push({ name: NAME, time: userTime })
 
-            gameOver('Wow!, A very Fast win! <br> time: ' + userTime + ' s')
-        }
-    } else if (resOnRes.status === 400) {
-        gameOver(resOnResDate.message + '<br> Game over!!')
+      gameOver('Wow!, a very fast win!<br>' + '<br>time: ' + userTime + ' s')
     }
+  } else if (resOnRes.status === 400) {
+    gameOver(resOnResData.message + '<br> Game Over')
+  }
 }
-
 
 /**
- * This function will create labels
- * which contains the anser alternatives
- * added eventlistner to check which radio button has been choosen
- * @param {object} alternatives alternative anser for the questions 
+ *
+ * This function will create labels that will contain
+ * the answer alternatives and will add a click listner to them.
+ * it works as a custom radio btns.
+ * @param {object} alternatives is the alternatives to answer the question.
  */
 function createRadioBtns (alternatives) {
+  for (const alt in alternatives) {
+    const label = document.createElement('label')
+    const radioBtn = document.createElement('input')
 
-    for (const alt in alternatives) {
-        const label = document.createElement('label')
-        const radioBtn = document.createElement('input')
+    label.classList.add('label')
+    label.innerText = alternatives[alt] // is the value to be shown in the page
+    label.name = alt // is the value of the custom btn
+    label.id = '0' // will be the 1 if the button is checked and 0 if not
 
-        label.classList.add('label')
-        label.innerHTML = alternatives[alt]
-        label.name = alt
-        label.id = '0'
+    radioBtn.type = 'radio'
+    radioBtn.name = 'radio-group'
+    label.appendChild(radioBtn)
+    radioBtnDiv.appendChild(label)
+    btns.push(label)
 
-        radioBtn.type = 'radio'
-        radioBtn.name = 'radio-group'
-
-        label.appendChild(radioBtn)
-        radioBtnDiv.appendChild(label)
-        btns.push(label)
-
-        label.addEventListener('click', () =>{
-            handleRadioBtn(label) 
-            for (let l = 0; l < btns.length; l++) {
-                btns[l].id = '0'
-                btns[l].style.borderColor = 'black'
-                btns[l].style.backgroundColor = 'rgba(0, 60, 255, 0.349)'
-                btns[l].style.border = '1px solid'
-            }
-            ansField.style.borderColor = 'black'
-            ansField.style.backgroundColor = 'white'
-            // Toggle the selection for the clicked button
-            label.id = label.id === '1' ? '0' : '1'
-            // styling based on the question type
-            radioBtn.tabIndex = 5
-
-        })
-        if (btns.length > 0) {
-            btns[0].focus()
-        }
+    // when any btn is clicked the value of it should change to 1
+    // and some styling changes to show that the btn was ckĺicked
+    label.addEventListener('click', () => {
+      handleRadioBtn(label)
+      for (let l = 0; l < btns.length; l++) {
+        btns[l].id = '0'
+        btns[l].style.borderColor = 'black'
+        btns[l].style.backgroundColor = 'rgba(0, 60, 255, 0.349)'
+        btns[l].style.border = '1px solid'
+      }
+      answerField.style.borderColor = 'black'
+      answerField.style.backgroundColor = 'white'
+      // Toggle the selection for the clicked button
+      label.id = label.id === '1' ? '0' : '1'
+      // styling based on the question type
+      radioBtn.tabIndex = 5
+    })
+    if (btns.length > 0) {
+      btns[0].focus()
     }
+  }
 }
-
 
 /**
  * Toggle the selection for the clicked radio button.
@@ -274,7 +278,7 @@ function handleRadioBtn (label) {
   // Enable/disable the submit button based on the question type
   // Use the boolean result directly instead of a ternary expression
   // answerBtn.disabled = label.id === '1' ? false : true
-  ansBtn.disabled = !(label.id === '1')
+  answerBtn.disabled = !(label.id === '1')
 }
 
 /**
@@ -316,13 +320,13 @@ function displayResults () {
   // look at list from localstorage and add the values to the list exsisting here.
   const savedScores = JSON.parse(localStorage.getItem('highScoreList'))
   if (savedScores != null) {
-    savedScores.forEach(result => highScorList.push(result))
+    savedScores.forEach(result => highScoreList.push(result))
   }
 
   // sort the list and get only the first 5 objects.
-  highScorList.sort((a, b) => a.time - b.time)
-  highScorList = highScoreList.slice(0, 5)
-  localStorage.setItem('highScoreList', JSON.stringify(highScorList))
+  highScoreList.sort((a, b) => a.time - b.time)
+  highScoreList = highScoreList.slice(0, 5)
+  localStorage.setItem('highScoreList', JSON.stringify(highScoreList))
 
   // create a table element
   const table = document.getElementById('score-table')
@@ -337,7 +341,7 @@ function displayResults () {
 
   // create a table body and add a row for each score in the highScoreList
   const tbody = document.createElement('tbody')
-  highScorList.forEach(result => {
+  highScoreList.forEach(result => {
     const tr = document.createElement('tr')
     tr.innerHTML = `<td>${result.name}</td><td>${result.time}</td>`
     tbody.appendChild(tr)
@@ -366,7 +370,7 @@ window.addEventListener('load', () => {
 restartBtn.addEventListener('click', e => {
   e.preventDefault()
 
-  highScorList = []
+  highScoreList = []
 
   resetProgressBar()
   if (questionContainer.style.display === 'none') {
@@ -446,4 +450,3 @@ function handleArrowDownKey () {
 
   nextElement.focus()
 }
-

@@ -34,6 +34,8 @@ function hideRule() {
     }, 6000)
 }
 
+const timeH2 = document.getElementById('time')
+
 /**
  * Function showing back the other elemenst fucntions.
  */
@@ -52,4 +54,5 @@ function hideShow(action, element) {
     (action === 'hide') ? element.style.display = 'none' : element.style.display = 'block'
 }
 
-export {hideRule, hideShow, removeWarningSign, displayWarningSign}
+export {hideRule, hideShow, removeWarningSign, displayWarningSign, hideRest}
+
