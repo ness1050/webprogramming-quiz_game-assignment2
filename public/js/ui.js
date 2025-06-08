@@ -35,6 +35,15 @@ function hideRule() {
 }
 
 /**
+ * Function showing back the other elemenst fucntions.
+ */
+function hideRest () {
+  const elementsToHide = [nameForm, timeH2]
+  elementsToHide.forEach(element => hideShow('show', element))
+}
+
+
+/**
  * hide or shows the element in the page based on the action button.
  * @param {action} action is to hide or show an element
  * @param {element} element element is to apply the style on 
@@ -42,3 +51,5 @@ function hideRule() {
 function hideShow(action, element) {
     (action === 'hide') ? element.style.display = 'none' : element.style.display = 'block'
 }
+
+export {hideRule, hideShow, removeWarningSign, displayWarningSign}

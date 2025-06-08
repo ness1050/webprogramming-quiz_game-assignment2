@@ -14,5 +14,3 @@ async function fetching (url, opition = null) {
     return await fetch(url, opition)
   }
 }
-
-export { fetching }

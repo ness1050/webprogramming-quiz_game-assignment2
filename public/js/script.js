@@ -1,6 +1,6 @@
 /* Author: Naseem Qurbanali*/
 
-import {displayWarningSign, removeWarningSign, hideShow, hideRest, hideRule} from 'ui'
+import {displayWarningSign, removeWarningSign, hideShow, hideRest, hideRule} from './ui'
 import { fetching } from './api'; 
 
 
@@ -316,13 +316,13 @@ function displayResults () {
   // look at list from localstorage and add the values to the list exsisting here.
   const savedScores = JSON.parse(localStorage.getItem('highScoreList'))
   if (savedScores != null) {
-    savedScores.forEach(result => highScoreList.push(result))
+    savedScores.forEach(result => highScorList.push(result))
   }
 
   // sort the list and get only the first 5 objects.
-  highScoreList.sort((a, b) => a.time - b.time)
-  highScoreList = highScoreList.slice(0, 5)
-  localStorage.setItem('highScoreList', JSON.stringify(highScoreList))
+  highScorList.sort((a, b) => a.time - b.time)
+  highScorList = highScoreList.slice(0, 5)
+  localStorage.setItem('highScoreList', JSON.stringify(highScorList))
 
   // create a table element
   const table = document.getElementById('score-table')
@@ -337,7 +337,7 @@ function displayResults () {
 
   // create a table body and add a row for each score in the highScoreList
   const tbody = document.createElement('tbody')
-  highScoreList.forEach(result => {
+  highScorList.forEach(result => {
     const tr = document.createElement('tr')
     tr.innerHTML = `<td>${result.name}</td><td>${result.time}</td>`
     tbody.appendChild(tr)
@@ -360,7 +360,90 @@ window.addEventListener('load', () => {
   clearHighScore()
 })
 
+/**
+ * restarts the game.
+ */
+restartBtn.addEventListener('click', e => {
+  e.preventDefault()
 
+  highScorList = []
 
+  resetProgressBar()
+  if (questionContainer.style.display === 'none') {
+    hideShow('hide', resultDiv)
+  }
 
+  hideShow('show', nameForm)
+  hideShow('show', timeH2)
+})
+
+/**
+ * It checks what type of key is pressed.
+ * @param {event} event handles which event is choicen.
+ */
+function handleKeyDown (event) {
+  switch (event.key) {
+    case 'Enter':
+      handleEnterKey()
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      handleArrowUpKey()
+      break
+    case 'ArrowDown':
+      event.preventDefault()
+      handleArrowDownKey()
+      break
+  }
+}
+
+// Event listener for keydown
+document.addEventListener('keydown', handleKeyDown)
+
+/**
+ * Handle the 'Enter' key press event.
+ * If the active element is the start button, initiate the quiz.
+ * If the active element is a radio button label.
+ * click on the radio button and focus on it.
+ */
+function handleEnterKey () {
+  const activeElement = document.activeElement
+
+  if (activeElement.id === 'start') {
+    startQuiz()
+  } else if (activeElement.classList.contains('label')) {
+    handleRadioBtn(activeElement)
+    activeElement.querySelector('input[type="radio"]').focus()
+    const radioBtn = activeElement.querySelector('input[type="radio"]')
+    radioBtn.focus()
+  }
+}
+
+/**
+ * Handles when keyboard  Arrowup key is used to navigate through page.
+ */
+function handleArrowUpKey () {
+  const currentElement = document.activeElement
+  const allFocusableElements = document.querySelectorAll('input, button, [tabindex]:not([tabindex="-1"])')
+  const currentIndex = Array.from(allFocusableElements).indexOf(currentElement)
+
+  const previousIndex = (currentIndex - 1 + allFocusableElements.length) % allFocusableElements.length
+  const previousElement = allFocusableElements[previousIndex]
+
+  previousElement.focus()
+}
+
+/**
+ * Handles the keyboard down key for
+ */
+function handleArrowDownKey () {
+  const currentElement = document.activeElement
+  const allFocusableElements = document.querySelectorAll('input, button, [tabindex]:not([tabindex="-1"])')
+  const currentIndex = Array.from(allFocusableElements).indexOf(currentElement)
+
+  const nextIndex = (currentIndex + 1) % allFocusableElements.length
+  const nextElement = allFocusableElements[nextIndex]
+
+  nextElement.focus()
+}
 

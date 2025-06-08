@@ -1,37 +1,261 @@
-/*Author: Naseem Qurbanali */
-
-
 body {
-    font-family: 'Times New Roman', Times, serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(to right bottom, rgba(11, 6, 6, 0.976), rgb(29, 163, 102));
-    color: #333;
-    width: 100%;
-    height: 100vh;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right bottom, rgba(11, 6, 6, 0.976), rgb(29, 163, 102));
+  color: #333;
+  width: 100%;
+  height: 100vh;
+  margin-top: 150px auto;
 }
 
 #rule {
-    text-align: center;
-    color: white;
-    border: 2px solid #121111;
-    border-radius: 20px;
-    max-width: 80%;
-    margin: 0 auto;
-    position: relative;
-    overflow: hidden;
-    font-style: italic;
+  text-align: center;
+  color: white;
+  border: 2px solid #121111;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 80%; 
+  margin: 0 auto; 
+  position: relative;
+  overflow: hidden;
+  font-style: initial;
 }
 
 #rule::before,
 #rule::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, #61a114e1, transparent, #0f6edbcb) ;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #61a114e1, transparent, #0f6edbcb); /* Adjust gradient as needed */
+  opacity: 0;
+  animation: sparkle 5s infinite; 
+}
+
+
+@keyframes sparkle {
+  0%, 100% {
     opacity: 0;
-    animation: sparkle 5s infinite;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.h2 {
+  margin-bottom: 15px auto;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  color: #cac413ee; 
+}
+
+form {
+  max-width: 600px;
+  margin: 5px auto;
+  background: linear-gradient(to left bottom, rgba(12, 194, 33, 0.656), rgba(14, 185, 215, 0.616));
+  padding: 10px;
+  border-radius: 20px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.864);
+  
+}
+
+form h1 {
+  font-family: 'Times New Roman', Times, serif;
+  text-align: center;
+  margin-bottom: 20px;
+  color: black;
+  
+}
+
+form label {
+  display: block;
+  margin-bottom: 10px;
+  font-family: fantasy;
+  color: whitesmoke;
+  text-align: left;
+}
+
+form input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+form button {
+  background-color: #060906c0; 
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+
+#Highscore-btn {
+  background-color: #ff9a16;
+  box-shadow: #121111;
+  margin-top: 20px;
+  text-align: center;
+  border-radius: 4px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+
+.question-container {
+  display: none;
+}
+
+.question-container h1,
+.result-div h1 {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#progress-bar {
+  height: 20px;
+  background-color: #1d3e1e; 
+}
+
+.progress-container {
+  position: relative;
+  height: 20px;
+  margin-top: 20px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, #ff5900 50%, #ffc107 50%);
+  transition: width 0.5s ease;
+  border-radius: 20px;
+}
+
+@keyframes moveProgressBar {
+  0%, 100%{
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 0%;
+  }
+}
+
+.progress-bar-top,
+.progress-bar-bottom {
+  height: 4px;
+  position: flex;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-size: 200% 100%;
+  animation: moveProgressBar 3s linear infinite;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 20%;
+}
+
+.progress-bar-top {
+  top: 0;
+  background: linear-gradient(to right, #007bff 30%, #ffc107 50%);
+  background-size: 200% 100%; 
+  
+}
+
+.progress-bar-bottom {
+  bottom: 0;
+  background: linear-gradient(to left, #1107d5 30%, #13c719 50%);
+  background-size: 200% 100%;
+}
+
+
+
+#time {
+  text-align: center;
+}
+
+label[for="answer"] {
+  display: block;
+  margin-top: 20px;
+}
+
+#answer {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.radio-buttons {
+  text-align: center;
+  margin-top: 20px;
+  color: white;
+  background-color: #33333391;
+  border-radius: 20px;
+}
+
+#submit,
+#restart {
+  background-color: #c62609e0;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+}
+
+.score-table {
+  width: 40%;
+  border-collapse: collapse;
+  margin: 20px auto;
+  border-radius: 20px;
+  
+}
+
+#score-table th,
+#score-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  background: #b7afa868;
+  height: 2vh;
+}
+
+
+/* Add this to your existing CSS or in a style block in your HTML */
+input[type="radio"] {
+  /* Hide the default radio button */
+  opacity: 0;
+  position: absolute;
+}
+
+.label {
+  /* Style for the label containing the radio button text */
+  cursor: pointer;
+  padding: 8px;
+  margin: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+/* Change the background color when the label is hovered or focused */
+.label:hover,
+.label:focus {
+  background-color: lightgreen;
+}
+
+/* Style for the radio button when it is checked */
+input[type="radio"]:checked + .label {
+  background-color: green;
+  color: white; /* Change text color when checked */
 }
