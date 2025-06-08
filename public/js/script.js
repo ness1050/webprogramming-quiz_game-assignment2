@@ -257,5 +257,27 @@ function createRadioBtns (alternatives) {
 }
 
 
+/**
+ * Toggle the selection for the clicked radio button.
+ * Update visual indicators and enable/disable the submit button based on the selection.
+ * @param {HTMLElement} label - The label element associated with the radio button.
+ */
+function handleRadioBtn (label) {
+  // Toggle the selection for the clicked button
+  label.id = label.id === '1' ? '0' : '1'
+
+  // Add visual indicators based on the selected state
+  label.style.borderColor = label.id === '1' ? 'green' : 'red'
+  label.style.backgroundColor = label.id === '1' ? 'rgba(0, 255, 0, 0.5)' : 'rgba(0, 60, 255, 0.349)'
+  label.style.border = label.id === '1' ? '2px solid' : '1px solid'
+
+  // Enable/disable the submit button based on the question type
+  // Use the boolean result directly instead of a ternary expression
+  // answerBtn.disabled = label.id === '1' ? false : true
+  ansBtn.disabled = !(label.id === '1')
+}
+
+
+
 
 
